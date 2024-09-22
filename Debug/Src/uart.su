@@ -1,0 +1,2 @@
+/home/guilherme/UFC/microcontroladores/rcc522/F1_Header/Include/core_cm3.h:1511:22:__NVIC_EnableIRQ	16	static
+../Src/uart.c:9:6:usartSetup	8	static
