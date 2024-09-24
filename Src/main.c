@@ -1,13 +1,13 @@
 #include <stdint.h>
 #include "stm32f1xx.h"
 #include "rc522.h"
-
-
+#include "uart.h"
 
 uint8_t status;
 uint8_t str[MAX_LEN]; // Max_LEN = 16
 uint8_t sNum[5];
 
+uint8_t *msg;
 
 void GPIO_Config() {
 	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
