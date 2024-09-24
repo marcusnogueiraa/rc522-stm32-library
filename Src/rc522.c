@@ -254,3 +254,101 @@ uchar MFRC522_Anticoll(uchar *serNum) {
     }
     return status;
 }
+
+void CalulateCRC(uchar *pIndata, uchar len, uchar *pOutData) {
+	uchar i, n;
+
+    ClearBitMask(DivIrqReg, 0x04);			//CRCIrq = 0
+    SetBitMask(FIFOLevelReg, 0x80);			//Clear the FIFO pointer
+    //Writing data to the FIFO
+    for(i = 0; i < len; i++) {
+		Write_MFRC522(FIFODataReg, *(pIndata+i));
+	}
+    Write_MFRC522(CommandReg, PCD_CALCCRC);
+
+    //Wait CRC calculation is complete
+    i = 0xFF;
+    do
+    {
+        n = Read_MFRC522(DivIrqReg);
+        i--;
+    }
+    while ((i!=0) && !(n&0x04));			//CRCIrq = 1
+
+    //Read CRC calculation result
+    pOutData[0] = Read_MFRC522(CRCResultRegL);
+    pOutData[1] = Read_MFRC522(CRCResultRegH);
+}
+
+uchar MFRC522_Write(uchar blockAddr, uchar *writeData) {
+    uchar status;
+    uint recvBits;
+    uchar i;
+	uchar buff[18];
+
+    buff[0] = PICC_WRITE;
+    buff[1] = blockAddr;
+    CalulateCRC(buff, 2, &buff[2]);
+    status = MFRC522_ToCard(PCD_TRANSCEIVE, buff, 4, buff, &recvBits);
+
+    if ((status != MI_OK) || (recvBits != 4) || ((buff[0] & 0x0F) != 0x0A))
+    {
+		status = MI_ERR;
+	}
+
+    if (status == MI_OK)
+    {
+        for (i=0; i<16; i++)		//Data to the FIFO write 16Byte
+        {
+        	buff[i] = *(writeData+i);
+        }
+        CalulateCRC(buff, 16, &buff[16]);
+        status = MFRC522_ToCard(PCD_TRANSCEIVE, buff, 18, buff, &recvBits);
+
+		if ((status != MI_OK) || (recvBits != 4) || ((buff[0] & 0x0F) != 0x0A))
+        {
+			status = MI_ERR;
+		}
+    }
+
+    return status;
+}
+
+uchar MFRC522_Read(uchar blockAddr, uchar *recvData) {
+    uchar status;
+    uint unLen;
+
+    recvData[0] = PICC_READ;
+    recvData[1] = blockAddr;
+    CalulateCRC(recvData,2, &recvData[2]);
+    status = MFRC522_ToCard(PCD_TRANSCEIVE, recvData, 4, recvData, &unLen);
+
+    if ((status != MI_OK) || (unLen != 0x90)) {
+        status = MI_ERR;
+    }
+
+    return status;
+}
+
+uchar MFRC522_Auth(uchar authMode, uchar BlockAddr, uchar *Sectorkey, uchar *serNum) {
+    uchar status;
+    uint recvBits;
+    uchar i;
+	uchar buff[12];
+
+    buff[0] = authMode;
+    buff[1] = BlockAddr;
+    for (i=0; i<6; i++) {
+		buff[i+2] = *(Sectorkey+i);
+	}
+    for (i=0; i<4; i++) {
+		buff[i+8] = *(serNum+i);
+	}
+    status = MFRC522_ToCard(PCD_AUTHENT, buff, 12, buff, &recvBits);
+
+    if ((status != MI_OK) || (!(Read_MFRC522(Status2Reg) & 0x08))) {
+		status = MI_ERR;
+	}
+
+    return status;
+}

@@ -135,6 +135,10 @@ void MFRC522_Init();
 uchar MFRC522_ToCard(uchar command, uchar *sendData, uchar sendLen, uchar *backData, uint *backLen);
 uchar MFRC522_Request(uchar reqMode, uchar *TagType);
 uchar MFRC522_Anticoll(uchar *serNum);
+void CalulateCRC(uchar *pIndata, uchar len, uchar *pOutData);
+uchar MFRC522_Read(uchar blockAddr, uchar *recvData);
+uchar MFRC522_Write(uchar blockAddr, uchar *writeData);
+uchar MFRC522_Auth(uchar authMode, uchar BlockAddr, uchar *Sectorkey, uchar *serNum);
 
 
 #endif /* RC522_H_ */
