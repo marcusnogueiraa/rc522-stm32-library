@@ -6,11 +6,36 @@
  */
 #include "uart.h"
 
-#ifdef ENABLE_IRQ
+
+#include <stdint.h>
+#include "stm32f1xx.h"
+
+
+
 uint8_t *ptr;
 
+void USART1_Init(){
+
+	GPIOA->CRH &= 0xFFFFFF0F;
+	GPIOA->CRH |= 0x000000B0;
+	//enable clock access to USART1
+	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
+
+	//Transmit Enable
+	USART1->CR1 |= USART_CR1_TE;
+
+	//Set Baud Rate
+	USART1->BRR = ((CPU_CLK + (BaudRate/2U))/BaudRate);
+
+	//Enable UART
+	USART1->CR1 |= USART_CR1_UE;
+
+	//Enable USART1 interrupt in NVIC
+	NVIC_EnableIRQ(USART1_IRQn);
+}
 void USART1_IRQHandler(void)
 {
+	GPIOB->ODR |= 0x00000100;
 	if((USART1->SR&USART_SR_TXE))
 	{
 		if(*ptr)
@@ -21,65 +46,7 @@ void USART1_IRQHandler(void)
 		else
 			USART1->CR1 &= ~USART_CR1_TXEIE; //At end of MSG, disable interrupt
 	}
-}
-#endif
-
-
-void usartTXSetup(){
-		//enable clock access to GPIOA
-		RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
-
-		/*Configure PA9(TX) as output maximum speed to 50MHz
-		 * and alternate output push-pull mode for USART1*/
-		GPIOA->CRH &= 0xFFFFFF0F;
-		GPIOA->CRH |= 0x000000B0;
-
-		/*USART1 configuration*/
-		//Transmit Enable
-		USART1->CR1 |= USART_CR1_TE;
-}
-
-void usartRXSetup(){
-	/*UART1 Pin configuration*/
-		//enable clock access to GPIOA
-		RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
-
-		//Configure PA10(RX) as as input floating as following
-		GPIOA->CRH &= 0xFFFFF0FF;
-		GPIOA->CRH |= 0x00000400;
-
-		/*USART1 configuration*/
-
-		//Enable receiver
-		USART1->CR1 |= USART_CR1_RE;
-		//Enable RXNIE interrupt
-		USART1->CR1|=USART_CR1_RXNEIE;
-
-}
-
-void usartSetup(){
-#ifdef ENABLE_TX
-		usartTXSetup();
-#endif
-
-#ifdef ENABLE_RX
-		usartRXSetup();
-#endif
-
-	//enable clock access to USART1
-	RCC->APB2ENR |= RCC_APB2ENR_USART1EN;
-	//Enable receiver
-	USART1->CR1 |= USART_CR1_RE;
-	//Set Baud Rate
-	USART1->BRR = ((CPU_CLK + (BaudRate/2U))/BaudRate);
-
-	//Enable UART
-	USART1->CR1 |= USART_CR1_UE;
-
-#ifdef ENABLE_RX
-	//Enable USART1 interrupt in NVIC
-	NVIC_EnableIRQ(USART1_IRQn);
-#endif
+	GPIOB->ODR &= ~0x00000100;
 }
 
 void uart_write(uint8_t *ch)
@@ -94,3 +61,27 @@ void uart_write(uint8_t *ch)
 	//Enable TXE interrupt
 	USART1->CR1 |= USART_CR1_TXEIE;
 }
+
+void int_to_string(uint8_t* data, int size, uint8_t* str) {
+    int index = 0;
+
+    for (int i = 0; i < size; i++) {
+        uint8_t num = data[i];
+        if (num < 10) {
+            str[index++] = num + '0';
+        } else if (num < 100) {
+            str[index++] = (num / 10) + '0';
+            str[index++] = (num % 10) + '0';
+        } else {
+            str[index++] = (num / 100) + '0';
+            str[index++] = ((num / 10) % 10) + '0';
+            str[index++] = (num % 10) + '0';
+        }
+        if (i < size - 1) {
+            str[index++] = '-';
+        }
+    }
+
+    str[index] = '\0';
+}
+
