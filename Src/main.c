@@ -62,6 +62,6 @@ int main() {
   MFRC522_Init();
   USART1_Init();
   while (1) {
-	Write_Content_Card(PICC_AUTHENT1A, myString, starBlock, defaultKey);
+	Write_Content_Card(PICC_AUTHENT1A, myString, startBlock, defaultKey);
   }
 }
