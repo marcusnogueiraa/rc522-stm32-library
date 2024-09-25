@@ -2,6 +2,10 @@
 #include "stm32f1xx.h"
 #include <stdint.h>
 
+uint8_t str[MAX_LEN]; // Max_LEN = 16
+uint8_t sNum[150];
+uint8_t ch[] = "\n\r";
+
 void SPI_TransmitReceive(const uint8_t *pTxData, uint8_t *pRxData, uint16_t Size) {
 	uint16_t i;
     for(i = 0; i < Size; i++) {
@@ -388,3 +392,17 @@ void MFRC522_Halt() {
   MFRC522_ToCard(PCD_TRANSCEIVE, buff, 4, buff,&unLen);
 }
 
+void Read_Single_Card() {
+    uchar requestStatus, anticollStatus;
+
+    requestStatus = MFRC522_Request(PICC_REQIDL, str);
+    if(requestStatus == MI_OK) {
+        anticollStatus = MFRC522_Anticoll(str);
+        if(anticollStatus == MI_OK) {
+            int_to_string(str, 5, sNum);
+            uart_write(sNum);
+            delay_ms(50);
+            uart_write(ch);
+        }
+    }
+}
