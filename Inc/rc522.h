@@ -1,10 +1,3 @@
-/*
- * rc522.h
- *
- *  Created on: Sep 22, 2024
- *      Author: guilherme
- */
-
 #ifndef RC522_H_
 #define RC522_H_
 
@@ -139,6 +132,8 @@ void CalulateCRC(uchar *pIndata, uchar len, uchar *pOutData);
 uchar MFRC522_Read(uchar blockAddr, uchar *recvData);
 uchar MFRC522_Write(uchar blockAddr, uchar *writeData);
 uchar MFRC522_Auth(uchar authMode, uchar BlockAddr, uchar *Sectorkey, uchar *serNum);
+uchar MFRC522_SelectTag(uchar *serNum);
+void MFRC522_Halt();
 
 
 #endif /* RC522_H_ */

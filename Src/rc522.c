@@ -1,10 +1,3 @@
-/*
- * rc522.c
- *
- *  Created on: Sep 22, 2024
- *      Author: guilherme
- */
-
 #include "rc522.h"
 #include "stm32f1xx.h"
 #include <stdint.h>
@@ -352,3 +345,46 @@ uchar MFRC522_Auth(uchar authMode, uchar BlockAddr, uchar *Sectorkey, uchar *ser
 
     return status;
 }
+
+
+uchar MFRC522_SelectTag(uchar *serNum) {
+  uchar i;
+  uchar status;
+  uchar size;
+  uint recvBits;
+  uchar buffer[9];
+
+  //ClearBitMask(Status2Reg, 0x08);      //MFCrypto1On=0
+
+    buffer[0] = PICC_SElECTTAG;
+    buffer[1] = 0x70;
+    for (i=0; i<5; i++)
+    {
+      buffer[i+2] = *(serNum+i);
+    }
+    CalulateCRC(buffer, 7, &buffer[7]);
+    status = MFRC522_ToCard(PCD_TRANSCEIVE, buffer, 9, buffer, &recvBits);
+
+    if ((status == MI_OK) && (recvBits == 0x18))
+    {
+    size = buffer[0];
+  }
+    else
+    {
+    size = 0;
+  }
+
+    return size;
+}
+
+void MFRC522_Halt() {
+  uint unLen;
+  uchar buff[4];
+
+  buff[0] = PICC_HALT;
+  buff[1] = 0;
+  CalulateCRC(buff, 2, &buff[2]);
+
+  MFRC522_ToCard(PCD_TRANSCEIVE, buff, 4, buff,&unLen);
+}
+
