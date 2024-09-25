@@ -134,6 +134,10 @@ uchar MFRC522_Write(uchar blockAddr, uchar *writeData);
 uchar MFRC522_Auth(uchar authMode, uchar BlockAddr, uchar *Sectorkey, uchar *serNum);
 uchar MFRC522_SelectTag(uchar *serNum);
 void MFRC522_Halt();
+
+
 void Read_Single_Card();
+void Write_Content_Card(uchar authMode, char* myString, uint8_t startBlock, uchar *Sectorkey);
+void Read_Content_Card(uchar authMode, uint8_t startBlock, uchar *Sectorkey);
 
 #endif /* RC522_H_ */

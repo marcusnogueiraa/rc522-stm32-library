@@ -1,6 +1,7 @@
 #include "rc522.h"
 #include "stm32f1xx.h"
 #include <stdint.h>
+#include <string.h>
 
 uint8_t str[MAX_LEN]; // Max_LEN = 16
 uint8_t sNum[150];
@@ -405,4 +406,72 @@ void Read_Single_Card() {
             uart_write(ch);
         }
     }
+}
+
+void Write_Content_Card(uchar authMode, char* myString, uint8_t startBlock, uchar *Sectorkey) {
+	 uchar requestStatus, anticollStatus, authStatus, writeStatus;
+	 uint8_t buffer[16];
+	 uint length = strlen(myString);
+	 uint8_t blockAddr = startBlock;
+	 requestStatus = MFRC522_Request(PICC_REQIDL, str);
+	 if(requestStatus == MI_OK) {
+		 anticollStatus = MFRC522_Anticoll(str);
+	     if(anticollStatus == MI_OK) {
+	    	 MFRC522_SelectTag(str);
+	    	 authStatus = MFRC522_Auth(authMode, startBlock, Sectorkey, str);
+	         if(authStatus == MI_OK) {
+	        	 for(int i = 0; i < length; i += 16) {
+	        		 memset(buffer, 0, sizeof(buffer));
+					 memcpy(buffer, myString + i, (length - i) > 16 ? 16 : (length - i));
+					 writeStatus = MFRC522_Write(blockAddr, buffer);
+					 if(writeStatus != MI_OK) {
+						 uint8_t msg[] = "ERRO: NAO FOI POSSIVEL ESCREVER NO CARTAO\n\r";
+						 uart_write(msg);
+					 }
+					 blockAddr++;
+	        	 }
+	        	 uint8_t msg0[] = "MENSAGEM: ";
+	        	 uint8_t msg1[] = "GRAVADA!\n\r";
+	        	 uart_write(msg0);
+	        	 delay_ms(100);
+	        	 uart_write((uint8_t*)myString);
+	        	 delay_ms(100);
+	        	 uart_write(msg1);
+	        	 MFRC522_Halt();
+	         }
+	     }
+	 }
+}
+
+void Read_Content_Card(uchar authMode, uint8_t startBlock, uchar *Sectorkey){
+	uchar requestStatus, anticollStatus, authStatus, readStatus;
+	uchar blockData[16];
+	uchar blockAddr = startBlock;
+	uint bytesRead = 0;
+	uint8_t readBuffer[64];
+	uint bufferSize = sizeof(readBuffer);
+	requestStatus = MFRC522_Request(PICC_REQIDL, str);
+	if(requestStatus == MI_OK) {
+		anticollStatus = MFRC522_Anticoll(str);
+	    if(anticollStatus == MI_OK) {
+	    	MFRC522_SelectTag(str);
+	        memset(readBuffer, 0, sizeof(readBuffer));
+	        authStatus = MFRC522_Auth(authMode, startBlock, Sectorkey, str);
+	            if (authStatus == MI_OK) {
+	            	while(bytesRead < bufferSize) {
+	            		readStatus = MFRC522_Read(blockAddr, blockData);
+	            		 if(readStatus == MI_OK) {
+	            			 uint bytesToCopy = (bufferSize - bytesRead) > 16 ? 16 : (bufferSize - bytesRead);
+	            			 memcpy(readBuffer + bytesRead, blockData, bytesToCopy);
+	            			 bytesRead += bytesToCopy;
+							if(memchr(blockData, '\0', 16) != NULL) {
+								break;
+							}
+							blockAddr++;
+	            		}
+	            	}
+	           }
+	           uart_write(readBuffer);
+	     }
+	 }
 }

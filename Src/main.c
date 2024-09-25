@@ -4,11 +4,9 @@
 #include "uart.h"
 #include "string.h"
 
-uint8_t status;
-uint8_t str[MAX_LEN]; // Max_LEN = 16
-uint8_t sNum[150];
-uint8_t ch[] = "\n\r";
-
+uint8_t defaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t startBlock = 4;
+char myString[] = "Testando 1, 2, 3... ";
 
 
 void GPIO_Config() {
@@ -63,18 +61,7 @@ int main() {
   SPI_Init();
   MFRC522_Init();
   USART1_Init();
-  while (1)
-  {
-    status = MFRC522_Request(PICC_REQIDL, str);
-    status = MFRC522_Anticoll(str);
-    int_to_string(str, 5, sNum);
-    if(!status){
-         GPIOC->BSRR = (uint32_t)GPIO_PIN_13 << 16;
-         uart_write(sNum);
-         for(int i = 0; i < 100000; i++);
-         uart_write(ch);
-       }else {
-    	   GPIOC->BSRR = GPIO_PIN_13;
-       }
+  while (1) {
+	Write_Content_Card(PICC_AUTHENT1A, myString, starBlock, defaultKey);
   }
 }
