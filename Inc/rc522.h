@@ -137,7 +137,8 @@ void MFRC522_Halt();
 
 
 void Read_Single_Card();
-void Write_Content_Card(uchar authMode, char* myString, uint8_t startBlock, uchar *Sectorkey);
-void Read_Content_Card(uchar authMode, uint8_t startBlock, uchar *Sectorkey);
+void Write_Content_Card(uchar authMode, uchar* myString, uchar startBlock, uchar *Sectorkey);
+void Read_Content_Card(uchar authMode, uchar startBlock, uchar *Sectorkey);
+
 
 #endif /* RC522_H_ */
