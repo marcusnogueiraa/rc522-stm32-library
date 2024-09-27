@@ -165,6 +165,8 @@ Essa biblioteca foi criada para simplificar a comunicação entre o microcontrol
 
 ## Conexão e Esquemático
 
+![Schematic](schematic.png)
+
 ### Conexão de Hardware
 
 Para utilizar esta biblioteca com o leitor RFID RC522 em uma placa STM32, será necessário fazer as seguintes conexões entre os pinos do RC522 e os pinos da STM32:
@@ -600,10 +602,6 @@ Lê o conteúdo de um bloco de um cartão RFID após autenticação.
 
 **Retorno:**  
 - **none**:
-
-
-## Esquemático
-![Schematic](schematic.png)
 
 ## Tratamento de Erros
 
