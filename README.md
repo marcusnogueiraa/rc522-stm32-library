@@ -188,7 +188,7 @@ Configure the PA4, PA5, PA6, and PA7 pins according to the hardware connection t
 
 Below is the schematic for connecting the RC522 reader to the STM32F103xx microcontroller.
 
-(Schematic image)
+![Schematic](schematic.png)
 
 ## Library Structure
 
@@ -275,124 +275,123 @@ int main() {
 ```
 
 ## API Reference
-
 ### `SPI_TransmitReceive`
 
 **Description:**  
 Function used to transmit and receive data via SPI.
 
 **Parameters:**  
-- **uint8_t data**: Data to be transmitted via SPI.
-
+- **pTxData**: Pointer for data to be transmitted via SPI.
+- **pRxData**: Pointer for data to be received via SPI.
+- **size**: Size of the amount of data to be sent and received.  
 **Return:**  
-- **uint8_t**: Data received after transmission.
-
+- **none**
 ---
 
 ### `RC522_SPI_Transfer`
 
 **Description:**  
-Wrapper function for sending and receiving data via SPI.
+Transfer data to MFRC522.
 
 **Parameters:**  
-- **uint8_t data**: Data to be transmitted via SPI.
+- **data**: Value to be written.
 
 **Return:**  
-- **uint8_t**: Data received after transmission.
+- **uint8_t**: One byte of data read from the module.
 
 ---
 
 ### `Write_MFRC522`
 
 **Description:**  
-Writes a value to a specific register address in the MFRC522 module.
+Writes a byte of data to a specific register of the MFRC522.
 
 **Parameters:**  
-- **uint8_t addr**: Register address in the MFRC522.  
-- **uint8_t val**: Value to be written to the register.
+- **addr**: Address of the register.
+- **val**: Value to be written.
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
 ### `Read_MFRC522`
 
 **Description:**  
-Reads a value from a specific register address in the MFRC522 module.
+Reads a byte from a data register of the MFRC522 module.
 
 **Parameters:**  
-- **uint8_t addr**: Register address to be read.
+- **addr**: Address of the register.
 
 **Return:**  
-- **uint8_t**: Value read from the register.
+- **uint8_t**: A byte of data read from the module.
 
 ---
 
 ### `SetBitMask`
 
 **Description:**  
-Sets the bits of a mask in a specific register.
+Sets a bit of the MFRC522 register.
 
 **Parameters:**  
-- **uint8_t reg**: Register address.  
-- **uint8_t mask**: Bit mask to be set.
+- **reg**: Address of the register.  
+- **mask**: Value to be set.
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
 ### `ClearBitMask`
 
 **Description:**  
-Clears the bits of a mask in a specific register.
+Clears bits of a specific register in the MFRC522 module according to the provided mask.
 
 **Parameters:**  
-- **uint8_t reg**: Register address.  
-- **uint8_t mask**: Bit mask to be cleared.
+- **reg**: Address of the register to be modified.  
+- **mask**: Mask that defines which bits will be cleared.
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
 ### `AntennaOn`
 
 **Description:**  
-Activates the antenna of the MFRC522.
+Activates the MFRC522 antenna.
 
 **Parameters:**  
-- **None**
+- **none**
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
 ### `AntennaOff`
 
 **Description:**  
-Deactivates the antenna of the MFRC522.
+Deactivates the MFRC522 antenna.
 
 **Parameters:**  
-- **None**
+- **none**
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
 ### `MFRC522_Reset`
 
 **Description:**  
-Resets the MFRC522 module.
+Clears the registers of the MFRC522 module.
 
 **Parameters:**  
-- **None**
+- **none**
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
@@ -402,70 +401,68 @@ Resets the MFRC522 module.
 Initializes the MFRC522 module and prepares SPI communication.
 
 **Parameters:**  
-- **None**
+- **none**
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
 ### `MFRC522_ToCard`
 
 **Description:**  
-Communicates directly with the RFID card to send commands and receive responses.
+Establishes communication between the RC522 module and a card, sending and receiving data according to the specified command.
 
-**Parameters
-
-:**  
-- **uint8_t command**: Command to be sent to the card.  
-- **uint8_t* sendData**: Data to be sent to the card.  
-- **uint8_t sendLen**: Length of the data to be sent.  
-- **uint8_t* backData**: Buffer where the response data will be stored.  
-- **uint16_t* backLen**: Length of the response received.
+**Parameters:**  
+- **command**: Command word of the MF522 to be sent.  
+- **sendData**: Data to be sent by the RC522 to the card.  
+- **sendLen**: Length of the data to be sent.  
+- **backData**: Data received from the card after communication.  
+- **backLen**: Length of the received data.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **uchar**: Status code of the operation.
 
 ---
 
 ### `MFRC522_Request`
 
 **Description:**  
-Requests the identification of an RFID card.
+Locates cards and reads the card type number.
 
 **Parameters:**  
-- **uint8_t reqMode**: Request mode to identify the card type.
+- **reqMode**: Request mode to identify the card type.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **uint8_t**: Status code of the operation.
 
 ---
 
 ### `MFRC522_Anticoll`
 
 **Description:**  
-Performs anti-collision to prevent multiple cards from responding at the same time.
+Collision detection, reading the serial number of the selected card.
 
 **Parameters:**  
-- **uint8_t* serNum**: Buffer where the card's serial number will be stored.
+- **uint8_t* serNum**: Buffer where the serial number of the card will be stored.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **uint8_t**: Status code of the operation.
 
 ---
 
-### `CalculateCRC`
+### `CalulateCRC`
 
 **Description:**  
-Calculates the CRC for data to communicate with the RFID card.
+Performs CRC (Cyclic Redundancy Check) calculation using the MFRC522 module, ensuring data integrity.
 
 **Parameters:**  
-- **uint8_t* pIndata**: Data for which the CRC will be calculated.  
-- **uint8_t len**: Length of the data.  
-- **uint8_t* pOutData**: Buffer where the calculated CRC will be stored.
+- **pIndata**: Input data for which the CRC will be calculated.  
+- **len**: Length of the input data.  
+- **pOutData**: Results of the CRC calculation to be stored.
 
 **Return:**  
-- **void**
+- **None**
 
 ---
 
@@ -475,11 +472,11 @@ Calculates the CRC for data to communicate with the RFID card.
 Writes a block of data to the RFID card.
 
 **Parameters:**  
-- **uint8_t blockAddr**: Block address where the data will be written.  
-- **uint8_t* writeData**: Data to be written to the card.
+- **blockAddr**: Address of the block where the data will be written.  
+- **writeData**: Data to be written to the card.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **uint8_t**: Status code of the operation.
 
 ---
 
@@ -489,53 +486,52 @@ Writes a block of data to the RFID card.
 Reads a block of data from the RFID card.
 
 **Parameters:**  
-- **uint8_t blockAddr**: Block address to be read.  
-- **uint8_t* recvData**: Buffer where the read data will be stored.
+- **blockAddr**: Address of the block to be read.  
+- **recvData**: Buffer where the read data will be stored.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **uint8_t**: Status code of the operation.
 
 ---
 
 ### `MFRC522_Auth`
 
 **Description:**  
-Authenticates a block on the RFID card for reading or writing.
+Authenticates a block of the RFID card for reading or writing.
 
 **Parameters:**  
-- **uint8_t authMode**: Authentication mode (typically `PICC_AUTHENT1A`).  
-- **uint8_t blockAddr**: Block address to be authenticated.  
+- **uint8_t authMode**: Authentication mode (usually `PICC_AUTHENT1A`).  
+- **uint8_t blockAddr**: Address of the block to be authenticated.  
 - **uint8_t* key**: Authentication key.  
-- **uint8_t* serNum**: Card serial number.
+- **uint8_t* serNum**: Serial number of the card.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **uint8_t**: Status code of the operation.
 
 ---
 
 ### `MFRC522_SelectTag`
-
 **Description:**  
 Selects the RFID card based on the serial number.
 
 **Parameters:**  
-- **uint8_t* serNum**: Serial number of the card to be selected.
+- **serNum**: Serial number of the card to be selected.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **uint8_t**: Status code of the operation.
 
 ---
 
 ### `MFRC522_Halt`
 
 **Description:**  
-Puts the RFID card in a Halt (stop) state.
+Puts the RFID card into the Halt (stop) state.
 
 **Parameters:**  
-- **None**
+- **none**
 
 **Return:**  
-- **void**
+- **none**
 
 ---
 
@@ -545,60 +541,53 @@ Puts the RFID card in a Halt (stop) state.
 Reads a single RFID card, authenticating and reading the data block.
 
 **Parameters:**  
-- **uint8_t* serNum**: Buffer where the card's serial number will be stored.  
-- **uint8_t* recvData**: Buffer where the read data will be stored.
+- **none**
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **none**
 
 ---
 
 ### `Read_Multiple_Cards`
 
 **Description:**  
-Reads multiple RFID cards, one at a time, authenticating and reading data from each card found.
+Reads multiple RFID cards.
 
 **Parameters:**  
-- **uint8_t* serNum**: Buffer where the card's serial number will be stored.  
-- **uint8_t* recvData**: Buffer where the read data from each card will be stored.
+- **none**
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **none**
 
 ---
 
 ### `Write_Content_Card`
 
 **Description:**  
-Writes custom content to a block of the RFID card after authentication.
-
 **Parameters:**  
-- **uint8_t blockAddr**: Block address where the data will be written.  
-- **uint8_t* writeData**: Buffer containing the data to be written to the card.  
-- **uint8_t* serNum**: Serial number of the card to be written.  
-- **uint8_t* key**: Authentication key.
+- **authMode**: Authentication mode (usually `PICC_AUTHENT1A`).  
+- **myString**: Buffer containing the data to be written to the card.  
+- **block**: Block to be written to the card.  
+- **Sectorkey**: Authentication key.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **none**
 
 ---
 
 ### `Read_Content_Card`
 
 **Description:**  
-Reads the content of a block from the RFID card after authentication.
+Reads the content of a block of an RFID card after authentication.
 
 **Parameters:**  
-- **uint8_t blockAddr**: Block address to be read.  
-- **uint8_t* recvData**: Buffer where the read data will be stored.  
-- **uint8_t* serNum**: Serial number of the card to be read.  
-- **uint8_t* key**: Authentication key.
+- **authMode**: Authentication mode (usually `PICC_AUTHENT1A`).   
+- **block**: Block to be read from the card.  
+- **Sectorkey**: Authentication key.
 
 **Return:**  
-- **uint8_t**: Operation status code.
+- **none**:
 
-## Schematic
-![Schematic](schematic.png)
 
 ## Error Handling
 

@@ -568,8 +568,7 @@ Realiza a leitura de um único cartão RFID, autenticando e lendo o bloco de dad
 Lê múltiplos cartões RFID.
 
 **Parâmetros:**  
-- **none**: Buffer onde o número de série do cartão será armazenado.  
-- **none**: Buffer onde os dados lidos de cada cartão serão armazenados.
+- **none**: 
 
 **Retorno:**  
 - **none**
