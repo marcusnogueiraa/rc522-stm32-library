@@ -211,70 +211,77 @@ Abaixo está o esquemático para conectar o leitor RC522 ao microcontrolador STM
 #include "uart.h"
 #include "string.h"
 
-uint8_t defaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t startBlock = 4;
-char myString[] = "Testando 1, 2, 3... ";
-
 void GPIO_Config() {
-	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-	RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
+  //Clock SPI, GPIOA and GPIOB enable
+  RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+  RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+  RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 
-
-	//PA4- CE,PA5-SCK,PA7-MOSI,PA6-MISO:
-
-	//PA5 SCK will be set as alternate function output pushpull
-	GPIOA->CRL |= GPIO_CRL_MODE5_0 | GPIO_CRL_MODE5_1;      	//Output Mode
-	GPIOA->CRL |= GPIO_CRL_CNF5_1;         						//Alternate Function
-	GPIOA->CRL &=  ~(GPIO_CRL_CNF5_0);
-	//PA7 MOSI will be set as alternate function output pushpull
-	GPIOA->CRL |= GPIO_CRL_MODE7_0 | GPIO_CRL_MODE7_1;     		//Output Mode
-	GPIOA->CRL |= GPIO_CRL_CNF7_1;         						//Alternate Function
-	GPIOA->CRL &=  ~(GPIO_CRL_CNF7_0);
-	//PA4 CE will be set as General Purpose Output Mode
-	GPIOA->CRL |= GPIO_CRL_MODE4_0 | GPIO_CRL_MODE4_1;     		//Output Mode
-	GPIOA->CRL &= ~GPIO_CRL_CNF4_1;         					//General Purpose
-	GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);  						//GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);
-	//PA6 MISO will be set as Floating Input Mode
-	GPIOA->CRL &= ~(GPIO_CRL_MODE6_0 | GPIO_CRL_MODE6_1);       //Input Mode
-	GPIOA->CRL &= ~GPIO_CRL_CNF6_1;        					    //Floating Input
-	GPIOA->CRL |=  (GPIO_CRL_CNF6_0);
-	//PC13
-	GPIOC->CRH = 0xFF0FFFFF;
-	GPIOC->CRH = 0x00200000;
-	GPIOC->ODR &= ~(1 << 13);
-	//PB0
-	GPIOB->CRL = 0xFFFFFFF0;
-	GPIOB->CRL = 0x00000002;
-	GPIOB->ODR &= ~(1 << 0);
+  //PA5 SCK
+  GPIOA->CRL |= GPIO_CRL_MODE5_0 | GPIO_CRL_MODE5_1;        //Output Mode
+  GPIOA->CRL |= GPIO_CRL_CNF5_1;                             //Alternate Function
+  GPIOA->CRL &=  ~(GPIO_CRL_CNF5_0);
+  //PA7 MOSI
+  GPIOA->CRL |= GPIO_CRL_MODE7_0 | GPIO_CRL_MODE7_1;         //Output Mode
+  GPIOA->CRL |= GPIO_CRL_CNF7_1;                             //Alternate Function
+  GPIOA->CRL &=  ~(GPIO_CRL_CNF7_0);
+  //PA4 NSS
+  GPIOA->CRL |= GPIO_CRL_MODE4_0 | GPIO_CRL_MODE4_1;         //Output Mode
+  GPIOA->CRL &= ~GPIO_CRL_CNF4_1;                           //General Purpose
+  GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);
+  //PA6 MISO
+  GPIOA->CRL &= ~(GPIO_CRL_MODE6_0 | GPIO_CRL_MODE6_1);     //Input Mode
+  GPIOA->CRL &= ~GPIO_CRL_CNF6_1;                            //Floating Input
+  GPIOA->CRL |=  (GPIO_CRL_CNF6_0);
+  //PB0 RST
+  GPIOB->CRL |= GPIO_CRL_MODE0_0 | GPIO_CRL_MODE0_1;         //Output Mode
+  GPIOB->CRL &= ~GPIO_CRL_CNF0_1;                           //General Purpose
+  GPIOB->CRL &=  ~(GPIO_CRL_CNF0_0);
 }
 
 void SPI_Init() {
-	GPIO_Config();
-	RCC->APB2ENR |= (1 << 12);      	// Enable SPI1 CLock
-	SPI1->CR1 &= ~(1 << 0) | (1 << 1);  // CPOL=0, CPHA=0
-	SPI1->CR1 |= (1 << 2);        		// Master Mode
-	SPI1->CR1 |= (2 << 3);        		// BR[2:0] = 010: fPCLK/8, PCLK2 = 72MHz, SPI clk = 9MHz
-	SPI1->CR1 &= ~(1 << 7);        		// LSBFIRST = 0, MSB first
-	SPI1->CR1 |= (1 << 8) | (1 << 9);   // SSM=1, SSi=1 -> Software Slave Management
-	SPI1->CR1 &= ~(1 << 10);        	// RXONLY = 0, full-duplex
-	SPI1->CR1 &= ~(1 << 11);       		// DFF=0, 8 bit data
-	SPI1->CR1 |= (1 << 6);        		// SPE=1, Peripheral enabled
+  GPIO_Config();
+  RCC->APB2ENR |= (1 << 12);          // Enable SPI1 CLock
+  SPI1->CR1 &= ~(1 << 0) | (1 << 1);  // CPOL=0, CPHA=0
+  SPI1->CR1 |= (1 << 2);              // Master Mode
+  SPI1->CR1 |= (2 << 3);              // BR[2:0] = 010: fPCLK/8, PCLK2 = 72MHz, SPI clk = 9MHz
+  SPI1->CR1 &= ~(1 << 7);              // LSBFIRST = 0, MSB first
+  SPI1->CR1 |= (1 << 8) | (1 << 9);   // SSM=1, SSi=1 -> Software Slave Management
+  SPI1->CR1 &= ~(1 << 10);            // RXONLY = 0, full-duplex
+  SPI1->CR1 &= ~(1 << 11);             // DFF=0, 8 bit data
+  SPI1->CR1 |= (1 << 6);              // SPE=1, Peripheral enabled
 }
 
-int main() {
-    SPI_Init();           // Inicializa SPI
-    MFRC522_Init();       // Inicializa o módulo RC522
-    USART1_Init();        // Inicializa UART para debug
+int main()
+{
+  SPI_Init();    
+  MFRC522_Init(); 
+  USART1_Init();  
 
-    uint8_t uid[10];
-    if (Read_MFRC522(uid) == MI_OK) {
-        uart_write("UID do cartão: %s\n", uid);
+  uint8_t str[MAX_LEN];
+  uint8_t sNum[150];
+  uint8_t ch[] = "\n\r";
+
+  while (1)
+  {
+    uchar requestStatus, anticollStatus;
+    requestStatus = MFRC522_Request(PICC_REQIDL, str);
+    if (requestStatus == MI_OK)
+    {
+      anticollStatus = MFRC522_Anticoll(str);
+      if (anticollStatus == MI_OK)
+      {
+        MFRC522_SelectTag(str);
+        int_to_string(str, 5, sNum);
+        uart_write(sNum);
+        delay_ms(50);
+        uart_write(ch);
+        MFRC522_Halt();
+      }
     }
-
-    return 0;
-} 
+  }
+  return 0;
+}
 ```
 
 
@@ -285,78 +292,78 @@ int main() {
 Função utilizada para transmitir e receber dados via SPI.
 
 **Parâmetros:**  
-- **uint8_t data**: Dado a ser transmitido via SPI.
-
+- **pTxData**: Ponteiro de dados de transmissão via SPI.
+- **pRxData**: Ponteiro de dados de recepção via SPI.
+- **size**: Tamanho da quantidade de dados a serem enviados e recebidos.
 **Retorno:**  
-- **uint8_t**: Dado recebido após a transmissão.
-
+- **none**
 ---
 
 ### `RC522_SPI_Transfer`
 
 **Descrição:**  
-Função wrapper para enviar e receber dados via SPI.
+Transferência de dados para MFRC522.
 
 **Parâmetros:**  
-- **uint8_t data**: Dado a ser transmitido via SPI.
+- **data**: valor a ser escrito
 
 **Retorno:**  
-- **uint8_t**: Dado recebido após a transmissão.
+- **uint8_t**:Um byte de dados lido do módulo
 
 ---
 
 ### `Write_MFRC522`
 
 **Descrição:**  
-Escreve um valor em um determinado endereço do registrador no módulo MFRC522.
+Para um determinado registrador do MFRC522, escrever um byte de dados.
 
 **Parâmetros:**  
-- **uint8_t addr**: Endereço do registrador no MFRC522.  
-- **uint8_t val**: Valor a ser escrito no registrador.
+- **addr**: endereço do registrador.
+- **val**: valor a ser escrito
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
 ### `Read_MFRC522`
 
 **Descrição:**  
-Lê um valor de um determinado endereço do registrador no módulo MFRC522.
+Leitura de um byte de um registrador de dados do módulo MFRC522.
 
 **Parâmetros:**  
-- **uint8_t addr**: Endereço do registrador a ser lido.
+- **addr**: Endereço do registrador.
 
 **Retorno:**  
-- **uint8_t**: Valor lido do registrador.
+- **uint8_t**: um byte de dado lido do módulo
 
 ---
 
 ### `SetBitMask`
 
 **Descrição:**  
-Configura os bits de uma máscara em um registrador específico.
+Define o bit do registro MFRC522
 
 **Parâmetros:**  
-- **uint8_t reg**: Endereço do registrador.  
-- **uint8_t mask**: Máscara de bits a ser configurada.
+- **reg**: Endereço do registrador.  
+- **mask**: valor a ser definido
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
 ### `ClearBitMask`
 
 **Descrição:**  
-Limpa os bits de uma máscara em um registrador específico.
+Limpa os bits de um determinado registrador no módulo MFRC522, conforme a máscara fornecida.
 
 **Parâmetros:**  
-- **uint8_t reg**: Endereço do registrador.  
-- **uint8_t mask**: Máscara de bits a ser limpa.
+- **reg**: Endereço do registrador que será modificado.  
+- **mask**: Máscara que define quais bits serão limpos.
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
@@ -366,10 +373,10 @@ Limpa os bits de uma máscara em um registrador específico.
 Ativa a antena do MFRC522.
 
 **Parâmetros:**  
-- **Nenhum**
+- **none**
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
@@ -379,23 +386,23 @@ Ativa a antena do MFRC522.
 Desativa a antena do MFRC522.
 
 **Parâmetros:**  
-- **Nenhum**
+- **none**
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
 ### `MFRC522_Reset`
 
 **Descrição:**  
-Reinicializa o módulo MFRC522.
+Limpa os resistradores do módulo MFRC522.
 
 **Parâmetros:**  
-- **Nenhum**
+- **none**
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
@@ -405,37 +412,37 @@ Reinicializa o módulo MFRC522.
 Inicializa o módulo MFRC522 e prepara a comunicação SPI.
 
 **Parâmetros:**  
-- **Nenhum**
+- **none**
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
 ### `MFRC522_ToCard`
 
 **Descrição:**  
-Comunica-se diretamente com o cartão RFID para enviar comandos e receber respostas.
+Estabelece a comunicação entre o módulo RC522 e um cartão, enviando e recebendo dados conforme o comando especificado.
 
 **Parâmetros:**  
-- **uint8_t command**: Comando a ser enviado ao cartão.  
-- **uint8_t* sendData**: Dados a serem enviados ao cartão.  
-- **uint8_t sendLen**: Comprimento dos dados enviados.  
-- **uint8_t* backData**: Buffer onde os dados de resposta serão armazenados.  
-- **uint16_t* backLen**: Comprimento da resposta recebida.
+- **command**: Palavra de comando do MF522 que será enviada.  
+- **sendData**: Dados que serão enviados pelo RC522 ao cartão.  
+- **sendLen**: Comprimento dos dados a serem enviados.  
+- **backData**: Dados recebidos do cartão após a comunicação.  
+- **backLen**: Comprimento dos dados recebidos.
 
 **Retorno:**  
-- **uint8_t**: Código de status da operação.
+- **uchar**: Código de status da operação.
 
 ---
 
 ### `MFRC522_Request`
 
 **Descrição:**  
-Solicita a identificação de um cartão RFID.
+Localiza cartões, lê o número do tipo de cartão
 
 **Parâmetros:**  
-- **uint8_t reqMode**: Modo de requisição para identificar o tipo de cartão.
+- **reqMode**: Modo de requisição para identificar o tipo de cartão.
 
 **Retorno:**  
 - **uint8_t**: Código de status da operação.
@@ -445,7 +452,7 @@ Solicita a identificação de um cartão RFID.
 ### `MFRC522_Anticoll`
 
 **Descrição:**  
-Executa o processo de anticolisão para evitar que múltiplos cartões respondam ao mesmo tempo.
+Detecção de anti-colisão, leitura do número de série do cartão selecionado
 
 **Parâmetros:**  
 - **uint8_t* serNum**: Buffer onde o número de série do cartão será armazenado.
@@ -458,15 +465,15 @@ Executa o processo de anticolisão para evitar que múltiplos cartões respondam
 ### `CalulateCRC`
 
 **Descrição:**  
-Calcula o CRC de dados para comunicação com o cartão RFID.
+Realiza o cálculo do CRC (Cyclic Redundancy Check) utilizando o módulo MFRC522, garantindo a integridade dos dados.
 
 **Parâmetros:**  
-- **uint8_t* pIndata**: Dados para os quais o CRC será calculado.  
-- **uint8_t len**: Comprimento dos dados.  
-- **uint8_t* pOutData**: Buffer onde o CRC calculado será armazenado.
+- **pIndata**: Dados de entrada para os quais o CRC será calculado.  
+- **len**: Comprimento dos dados de entrada.  
+- **pOutData**: Resultados do cálculo do CRC que serão armazenados.
 
 **Retorno:**  
-- **void**
+- **None**
 
 ---
 
@@ -476,8 +483,8 @@ Calcula o CRC de dados para comunicação com o cartão RFID.
 Escreve um bloco de dados no cartão RFID.
 
 **Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco onde os dados serão escritos.  
-- **uint8_t* writeData**: Dados a serem escritos no cartão.
+- **blockAddr**: Endereço do bloco onde os dados serão escritos.  
+- **writeData**: Dados a serem escritos no cartão.
 
 **Retorno:**  
 - **uint8_t**: Código de status da operação.
@@ -490,8 +497,8 @@ Escreve um bloco de dados no cartão RFID.
 Lê um bloco de dados do cartão RFID.
 
 **Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco a ser lido.  
-- **uint8_t* recvData**: Buffer onde os dados lidos serão armazenados.
+- **blockAddr**: Endereço do bloco a ser lido.  
+- **recvData**: Buffer onde os dados lidos serão armazenados.
 
 **Retorno:**  
 - **uint8_t**: Código de status da operação.
@@ -499,6 +506,7 @@ Lê um bloco de dados do cartão RFID.
 ---
 
 ### `MFRC522_Auth`
+
 
 **Descrição:**  
 Autentica um bloco do cartão RFID para leitura ou escrita.
@@ -515,12 +523,11 @@ Autentica um bloco do cartão RFID para leitura ou escrita.
 ---
 
 ### `MFRC522_SelectTag`
-
 **Descrição:**  
 Seleciona o cartão RFID com base no número de série.
 
 **Parâmetros:**  
-- **uint8_t* serNum**: Número de série do cartão a ser selecionado.
+- **serNum**: Número de série do cartão a ser selecionado.
 
 **Retorno:**  
 - **uint8_t**: Código de status da operação.
@@ -533,10 +540,10 @@ Seleciona o cartão RFID com base no número de série.
 Coloca o cartão RFID no estado de Halt (parada).
 
 **Parâmetros:**  
-- **Nenhum**
+- **none**
 
 **Retorno:**  
-- **void**
+- **none**
 
 ---
 
@@ -546,41 +553,38 @@ Coloca o cartão RFID no estado de Halt (parada).
 Realiza a leitura de um único cartão RFID, autenticando e lendo o bloco de dados.
 
 **Parâmetros:**  
-- **uint8_t* serNum**: Buffer onde o número de série do cartão será armazenado.  
-- **uint8_t* recvData**: Buffer onde os dados lidos serão armazenados.
+- **none**
 
 **Retorno:**  
-- **uint8_t**: Código de status da operação.
+- **none**
 
 ---
 
 ### `Read_Multiple_Cards`
 
 **Descrição:**  
-Lê múltiplos cartões RFID, um por vez, realizando a autenticação e leitura de dados de cada cartão encontrado.
+Lê múltiplos cartões RFID.
 
 **Parâmetros:**  
-- **uint8_t* serNum**: Buffer onde o número de série do cartão será armazenado.  
-- **uint8_t* recvData**: Buffer onde os dados lidos de cada cartão serão armazenados.
+- **none**: Buffer onde o número de série do cartão será armazenado.  
+- **none**: Buffer onde os dados lidos de cada cartão serão armazenados.
 
 **Retorno:**  
-- **uint8_t**: Código de status da operação.
+- **none**
 
 ---
 
 ### `Write_Content_Card`
 
 **Descrição:**  
-Escreve um conteúdo personalizado em um bloco do cartão RFID após autenticação.
-
 **Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco onde os dados serão escritos.  
-- **uint8_t* writeData**: Buffer contendo os dados que serão escritos no cartão.  
-- **uint8_t* serNum**: Número de série do cartão a ser escrito.  
-- **uint8_t* key**: Chave de autenticação.
+- **authMode**: Modo de autenticação (geralmente `PICC_AUTHENT1A`).  
+- **myString**: Buffer contendo os dados que serão escritos no cartão.  
+- **block**: Bloco a ser escrito no cartão.  
+- **Sectorkey**: Chave de autenticação.
 
 **Retorno:**  
-- **uint8_t**: Código de status da operação.
+- **none**
 
 ---
 
@@ -590,13 +594,13 @@ Escreve um conteúdo personalizado em um bloco do cartão RFID após autenticaç
 Lê o conteúdo de um bloco de um cartão RFID após autenticação.
 
 **Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco a ser lido.  
-- **uint8_t* recvData**: Buffer onde os dados lidos serão armazenados.  
-- **uint8_t* serNum**: Número de série do cartão a ser lido.  
-- **uint8_t* key**: Chave de autenticação.
+- **authMode**: Modo de autenticação (geralmente `PICC_AUTHENT1A`).   
+- **block**: Bloco a ser lido no cartão.  
+- **Sectorkey**: Chave de autenticação..
 
 **Retorno:**  
-- **uint8_t**: Código de status da operação.
+- **none**:
+
 
 ## Esquemático
 ![Schematic](schematic.png)
