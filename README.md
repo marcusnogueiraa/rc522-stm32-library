@@ -158,7 +158,7 @@ Essa biblioteca foi criada para simplificar a comunicação entre o microcontrol
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/usuario/rc522-stm32
+   git clone [https://github.com/usuario/rc522-stm32](https://github.com/marcusnogueiraa/rc522-stm32-library)
    ```
 
 2. Adicione os arquivos da biblioteca ao seu projeto STM32CubeIDE.
