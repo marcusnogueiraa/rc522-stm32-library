@@ -1,11 +1,13 @@
 # RC522 RFID - STM32 Library
 Collaborative project among students of the Microcontrollers course, aiming to create a library that abstracts the use of the RFID reader module RC522 on STM32 Blue Pill microcontrollers.
 
+See documentation in Portuguese (Brazil) [here](README-PT.md).
+
 ## 🚀 Features
-- [ ] **a) Read Single Card ID (UART Output):** Function to detect and read the unique identifier (UID) of an RFID card and output the result via UART interface.
-- [ ] **b) Read Multiple Card IDs (UART Output):** Function to detect and read the unique identifiers of multiple RFID cards consecutively, with output of results through the UART interface.
-- [ ] **c) Write Content (String) to RFID Card:** Function to write a specific string to the storage of an RFID card, allowing for customization or specific use of the card.
-- [ ] **d) Read Content (String) from RFID Card:** Function to retrieve and read a previously stored string from an RFID card.
+- [x] **a) Read Single Card ID (UART Output):** Function to detect and read the unique identifier (UID) of an RFID card and output the result via UART interface.
+- [x] **b) Read Multiple Card IDs (UART Output):** Function to detect and read the unique identifiers of multiple RFID cards consecutively, with output of results through the UART interface.
+- [x] **c) Write Content (String) to RFID Card:** Function to write a specific string to the storage of an RFID card, allowing for customization or specific use of the card.
+- [x] **d) Read Content (String) from RFID Card:** Function to retrieve and read a previously stored string from an RFID card.
 - [ ] **e) Active Communication - Module-to-Module Chat:** Implementation of a bidirectional communication system between multiple RFID modules, enabling real-time message exchange.
 - [ ] **f) Active Communication: Module-to-Smartphone NFC:** Function that allows communication between the RFID module and an NFC-equipped smartphone, enabling direct reading and writing of data between the devices.
 
@@ -139,72 +141,67 @@ Sorted alphabetically
 </table>
 
 
-
----
+----
 # rc522-stm32-Library
 
-Essa biblioteca foi criada para simplificar a comunicação entre o microcontrolador STM32 (da linha STM32F103xx) e o leitor de RFID RC522 usando a interface SPI. Em vez de lidar com a complexidade de controlar o RC522 diretamente, ela facilita o processo, permitindo que o usuário trabalhe com cartões RFID de maneira prática e eficiente.
+This library was created to simplify communication between the STM32 microcontroller (from the STM32F103xx family) and the RC522 RFID reader using the SPI interface. Instead of handling the complexity of directly controlling the RC522, it streamlines the process, allowing the user to work with RFID cards in a practical and efficient way.
 
-**Dependências:**
-- Protocolo SPI
-- Biblioteca stdint.h
-- Biblioteca stm32f1xx.h
+**Dependencies:**
+- SPI protocol
+- stdint.h library
+- stm32f1xx.h library
 
-**Versão Atual:** 1.0.0
-**Licença:** MIT License
+**Current Version:** 1.0.0  
+**License:** MIT License
 
+## Installation
 
-## Instalação
-
-1. Clone o repositório:
+1. Clone the repository:
    ```bash
    git clone https://github.com/marcusnogueiraa/rc522-stm32-library
    ```
 
-2. Adicione os arquivos da biblioteca ao seu projeto STM32CubeIDE.
+2. Add the library files to your STM32CubeIDE project.
 
-3. Configure os pinos SPI e GPIO na sua `Main` de acordo com as instruções fornecidas no codigo de exemplo.
+3. Configure the SPI and GPIO pins in your `Main` according to the instructions provided in the example code.
 
-## Conexão e Esquemático
+## Connection and Schematic
 
-### Conexão de Hardware
+### Hardware Connection
 
-Para utilizar esta biblioteca com o leitor RFID RC522 em uma placa STM32, será necessário fazer as seguintes conexões entre os pinos do RC522 e os pinos da STM32:
+To use this library with the RC522 RFID reader on an STM32 board, you will need to make the following connections between the RC522 pins and the STM32 pins:
 
-| Pino do RC522 | Função | Pino da STM32 |
-| ------------- | ------ | ------------- |
-| VCC           | Alimentação 3.3V | 3.3V |
-| GND           | Terra                | GND     |
-| RST           | Reset do módulo      | PB0     |
-| IRQ           | Interrupção (não utilizado) | -     |
-| MISO          | SPI Master-In Slave-Out | PA6    |
-| MOSI          | SPI Master-Out Slave-In  | PA7    |
-| SCK           | SPI Clock               | PA5    |
-| SDA (SS)      | Slave Select            | PA4    |
+| RC522 Pin | Function              | STM32 Pin |
+| --------- | --------------------- | --------- |
+| VCC       | Power Supply 3.3V      | 3.3V      |
+| GND       | Ground                 | GND       |
+| RST       | Module Reset           | PB0       |
+| IRQ       | Interrupt (not used)   | -         |
+| MISO      | SPI Master-In Slave-Out | PA6       |
+| MOSI      | SPI Master-Out Slave-In | PA7       |
+| SCK       | SPI Clock              | PA5       |
+| SDA (SS)  | Slave Select           | PA4       |
 
-Configure os pinos PA4, PA5, PA6 e PA7 conforme a tabela de conexões dee hardware.
+Configure the PA4, PA5, PA6, and PA7 pins according to the hardware connection table.
 
-## Esquemático de Conexão
+## Connection Schematic
 
-Abaixo está o esquemático para conectar o leitor RC522 ao microcontrolador STM3Ff103xx.
+Below is the schematic for connecting the RC522 reader to the STM32F103xx microcontroller.
 
-(Imagem do esquemático)
+(Schematic image)
 
+## Library Structure
 
+- `rc522.c`: Implements the main functions for using the RC522.
+- `rc522.h`: Function declarations and macro definitions for the RC522.
+- `timer.c`: Timer initialization and operation functions.
+- `timer.h`: Timer function declarations and macro definitions.
+- `uart.c`: Implements the UART interface for serial communication with the device.
+- `uart.h`: UART function declarations and macro definitions.
 
-## Estrutura da Biblioteca
+## Usage Example
 
-- `rc522.c`: Implementa as funções principais para o uso do RC522.
-- `rc522.h`: Declaração de funções e definições de macros para o RC522.
-- `timer.c`: Funções de inicialização e operação do timer.
-- `timer.h`: Declaração de funções e definições de macros para o timer.
-- `uart.c`: Implementa a interface UART para a comunicação serial com o dispositivo.
-- `uart.h`: Declaração de funções e definições de macros paraa uart.
-
-
-## Exemplo de Uso
-
-### Inicialização
+### Initialization
 
 ```c
 #include <stdint.h>
@@ -215,405 +212,401 @@ Abaixo está o esquemático para conectar o leitor RC522 ao microcontrolador STM
 
 uint8_t defaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
 uint8_t startBlock = 4;
-char myString[] = "Testando 1, 2, 3... ";
+char myString[] = "Testing 1, 2, 3... ";
 
 void GPIO_Config() {
-	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-	RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
+    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
+    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 
-
-	//PA4- CE,PA5-SCK,PA7-MOSI,PA6-MISO:
-
-	//PA5 SCK will be set as alternate function output pushpull
-	GPIOA->CRL |= GPIO_CRL_MODE5_0 | GPIO_CRL_MODE5_1;      	//Output Mode
-	GPIOA->CRL |= GPIO_CRL_CNF5_1;         						//Alternate Function
-	GPIOA->CRL &=  ~(GPIO_CRL_CNF5_0);
-	//PA7 MOSI will be set as alternate function output pushpull
-	GPIOA->CRL |= GPIO_CRL_MODE7_0 | GPIO_CRL_MODE7_1;     		//Output Mode
-	GPIOA->CRL |= GPIO_CRL_CNF7_1;         						//Alternate Function
-	GPIOA->CRL &=  ~(GPIO_CRL_CNF7_0);
-	//PA4 CE will be set as General Purpose Output Mode
-	GPIOA->CRL |= GPIO_CRL_MODE4_0 | GPIO_CRL_MODE4_1;     		//Output Mode
-	GPIOA->CRL &= ~GPIO_CRL_CNF4_1;         					//General Purpose
-	GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);  						//GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);
-	//PA6 MISO will be set as Floating Input Mode
-	GPIOA->CRL &= ~(GPIO_CRL_MODE6_0 | GPIO_CRL_MODE6_1);       //Input Mode
-	GPIOA->CRL &= ~GPIO_CRL_CNF6_1;        					    //Floating Input
-	GPIOA->CRL |=  (GPIO_CRL_CNF6_0);
-	//PC13
-	GPIOC->CRH = 0xFF0FFFFF;
-	GPIOC->CRH = 0x00200000;
-	GPIOC->ODR &= ~(1 << 13);
-	//PB0
-	GPIOB->CRL = 0xFFFFFFF0;
-	GPIOB->CRL = 0x00000002;
-	GPIOB->ODR &= ~(1 << 0);
+    // PA4- CE, PA5-SCK, PA7-MOSI, PA6-MISO:
+    // PA5 SCK will be set as alternate function output push-pull
+    GPIOA->CRL |= GPIO_CRL_MODE5_0 | GPIO_CRL_MODE5_1;  // Output Mode
+    GPIOA->CRL |= GPIO_CRL_CNF5_1;                     // Alternate Function
+    GPIOA->CRL &=  ~(GPIO_CRL_CNF5_0);
+    // PA7 MOSI will be set as alternate function output push-pull
+    GPIOA->CRL |= GPIO_CRL_MODE7_0 | GPIO_CRL_MODE7_1;  // Output Mode
+    GPIOA->CRL |= GPIO_CRL_CNF7_1;                     // Alternate Function
+    GPIOA->CRL &=  ~(GPIO_CRL_CNF7_0);
+    // PA4 CE will be set as General Purpose Output Mode
+    GPIOA->CRL |= GPIO_CRL_MODE4_0 | GPIO_CRL_MODE4_1;  // Output Mode
+    GPIOA->CRL &= ~GPIO_CRL_CNF4_1;                     // General Purpose
+    GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);
+    // PA6 MISO will be set as Floating Input Mode
+    GPIOA->CRL &= ~(GPIO_CRL_MODE6_0 | GPIO_CRL_MODE6_1);  // Input Mode
+    GPIOA->CRL &= ~GPIO_CRL_CNF6_1;                       // Floating Input
+    GPIOA->CRL |=  (GPIO_CRL_CNF6_0);
+    // PC13
+    GPIOC->CRH = 0xFF0FFFFF;
+    GPIOC->CRH = 0x00200000;
+    GPIOC->ODR &= ~(1 << 13);
+    // PB0
+    GPIOB->CRL = 0xFFFFFFF0;
+    GPIOB->CRL = 0x00000002;
+    GPIOB->ODR &= ~(1 << 0);
 }
 
 void SPI_Init() {
-	GPIO_Config();
-	RCC->APB2ENR |= (1 << 12);      	// Enable SPI1 CLock
-	SPI1->CR1 &= ~(1 << 0) | (1 << 1);  // CPOL=0, CPHA=0
-	SPI1->CR1 |= (1 << 2);        		// Master Mode
-	SPI1->CR1 |= (2 << 3);        		// BR[2:0] = 010: fPCLK/8, PCLK2 = 72MHz, SPI clk = 9MHz
-	SPI1->CR1 &= ~(1 << 7);        		// LSBFIRST = 0, MSB first
-	SPI1->CR1 |= (1 << 8) | (1 << 9);   // SSM=1, SSi=1 -> Software Slave Management
-	SPI1->CR1 &= ~(1 << 10);        	// RXONLY = 0, full-duplex
-	SPI1->CR1 &= ~(1 << 11);       		// DFF=0, 8 bit data
-	SPI1->CR1 |= (1 << 6);        		// SPE=1, Peripheral enabled
+    GPIO_Config();
+    RCC->APB2ENR |= (1 << 12);         // Enable SPI1 Clock
+    SPI1->CR1 &= ~(1 << 0) | (1 << 1); // CPOL=0, CPHA=0
+    SPI1->CR1 |= (1 << 2);             // Master Mode
+    SPI1->CR1 |= (2 << 3);             // BR[2:0] = 010: fPCLK/8, PCLK2 = 72MHz, SPI clk = 9MHz
+    SPI1->CR1 &= ~(1 << 7);            // LSBFIRST = 0, MSB first
+    SPI1->CR1 |= (1 << 8) | (1 << 9);  // SSM=1, SSI=1 -> Software Slave Management
+    SPI1->CR1 &= ~(1 << 10);           // RXONLY = 0, full-duplex
+    SPI1->CR1 &= ~(1 << 11);           // DFF=0, 8 bit data
+    SPI1->CR1 |= (1 << 6);             // SPE=1, Peripheral enabled
 }
 
 int main() {
-    SPI_Init();           // Inicializa SPI
-    MFRC522_Init();       // Inicializa o módulo RC522
-    USART1_Init();        // Inicializa UART para debug
+    SPI_Init();           // Initialize SPI
+    MFRC522_Init();       // Initialize the RC522 module
+    USART1_Init();        // Initialize UART for debugging
 
     uint8_t uid[10];
     if (Read_MFRC522(uid) == MI_OK) {
-        uart_write("UID do cartão: %s\n", uid);
+        uart_write("Card UID: %s\n", uid);
     }
 
     return 0;
 } 
 ```
 
+## API Reference
 
-## Referência da API
 ### `SPI_TransmitReceive`
 
-**Descrição:**  
-Função utilizada para transmitir e receber dados via SPI.
+**Description:**  
+Function used to transmit and receive data via SPI.
 
-**Parâmetros:**  
-- **uint8_t data**: Dado a ser transmitido via SPI.
+**Parameters:**  
+- **uint8_t data**: Data to be transmitted via SPI.
 
-**Retorno:**  
-- **uint8_t**: Dado recebido após a transmissão.
+**Return:**  
+- **uint8_t**: Data received after transmission.
 
 ---
 
 ### `RC522_SPI_Transfer`
 
-**Descrição:**  
-Função wrapper para enviar e receber dados via SPI.
+**Description:**  
+Wrapper function for sending and receiving data via SPI.
 
-**Parâmetros:**  
-- **uint8_t data**: Dado a ser transmitido via SPI.
+**Parameters:**  
+- **uint8_t data**: Data to be transmitted via SPI.
 
-**Retorno:**  
-- **uint8_t**: Dado recebido após a transmissão.
+**Return:**  
+- **uint8_t**: Data received after transmission.
 
 ---
 
 ### `Write_MFRC522`
 
-**Descrição:**  
-Escreve um valor em um determinado endereço do registrador no módulo MFRC522.
+**Description:**  
+Writes a value to a specific register address in the MFRC522 module.
 
-**Parâmetros:**  
-- **uint8_t addr**: Endereço do registrador no MFRC522.  
-- **uint8_t val**: Valor a ser escrito no registrador.
+**Parameters:**  
+- **uint8_t addr**: Register address in the MFRC522.  
+- **uint8_t val**: Value to be written to the register.
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `Read_MFRC522`
 
-**Descrição:**  
-Lê um valor de um determinado endereço do registrador no módulo MFRC522.
+**Description:**  
+Reads a value from a specific register address in the MFRC522 module.
 
-**Parâmetros:**  
-- **uint8_t addr**: Endereço do registrador a ser lido.
+**Parameters:**  
+- **uint8_t addr**: Register address to be read.
 
-**Retorno:**  
-- **uint8_t**: Valor lido do registrador.
+**Return:**  
+- **uint8_t**: Value read from the register.
 
 ---
 
 ### `SetBitMask`
 
-**Descrição:**  
-Configura os bits de uma máscara em um registrador específico.
+**Description:**  
+Sets the bits of a mask in a specific register.
 
-**Parâmetros:**  
-- **uint8_t reg**: Endereço do registrador.  
-- **uint8_t mask**: Máscara de bits a ser configurada.
+**Parameters:**  
+- **uint8_t reg**: Register address.  
+- **uint8_t mask**: Bit mask to be set.
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `ClearBitMask`
 
-**Descrição:**  
-Limpa os bits de uma máscara em um registrador específico.
+**Description:**  
+Clears the bits of a mask in a specific register.
 
-**Parâmetros:**  
-- **uint8_t reg**: Endereço do registrador.  
-- **uint8_t mask**: Máscara de bits a ser limpa.
+**Parameters:**  
+- **uint8_t reg**: Register address.  
+- **uint8_t mask**: Bit mask to be cleared.
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `AntennaOn`
 
-**Descrição:**  
-Ativa a antena do MFRC522.
+**Description:**  
+Activates the antenna of the MFRC522.
 
-**Parâmetros:**  
-- **Nenhum**
+**Parameters:**  
+- **None**
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `AntennaOff`
 
-**Descrição:**  
-Desativa a antena do MFRC522.
+**Description:**  
+Deactivates the antenna of the MFRC522.
 
-**Parâmetros:**  
-- **Nenhum**
+**Parameters:**  
+- **None**
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `MFRC522_Reset`
 
-**Descrição:**  
-Reinicializa o módulo MFRC522.
+**Description:**  
+Resets the MFRC522 module.
 
-**Parâmetros:**  
-- **Nenhum**
+**Parameters:**  
+- **None**
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `MFRC522_Init`
 
-**Descrição:**  
-Inicializa o módulo MFRC522 e prepara a comunicação SPI.
+**Description:**  
+Initializes the MFRC522 module and prepares SPI communication.
 
-**Parâmetros:**  
-- **Nenhum**
+**Parameters:**  
+- **None**
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `MFRC522_ToCard`
 
-**Descrição:**  
-Comunica-se diretamente com o cartão RFID para enviar comandos e receber respostas.
+**Description:**  
+Communicates directly with the RFID card to send commands and receive responses.
 
-**Parâmetros:**  
-- **uint8_t command**: Comando a ser enviado ao cartão.  
-- **uint8_t* sendData**: Dados a serem enviados ao cartão.  
-- **uint8_t sendLen**: Comprimento dos dados enviados.  
-- **uint8_t* backData**: Buffer onde os dados de resposta serão armazenados.  
-- **uint16_t* backLen**: Comprimento da resposta recebida.
+**Parameters
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+:**  
+- **uint8_t command**: Command to be sent to the card.  
+- **uint8_t* sendData**: Data to be sent to the card.  
+- **uint8_t sendLen**: Length of the data to be sent.  
+- **uint8_t* backData**: Buffer where the response data will be stored.  
+- **uint16_t* backLen**: Length of the response received.
+
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `MFRC522_Request`
 
-**Descrição:**  
-Solicita a identificação de um cartão RFID.
+**Description:**  
+Requests the identification of an RFID card.
 
-**Parâmetros:**  
-- **uint8_t reqMode**: Modo de requisição para identificar o tipo de cartão.
+**Parameters:**  
+- **uint8_t reqMode**: Request mode to identify the card type.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `MFRC522_Anticoll`
 
-**Descrição:**  
-Executa o processo de anticolisão para evitar que múltiplos cartões respondam ao mesmo tempo.
+**Description:**  
+Performs anti-collision to prevent multiple cards from responding at the same time.
 
-**Parâmetros:**  
-- **uint8_t* serNum**: Buffer onde o número de série do cartão será armazenado.
+**Parameters:**  
+- **uint8_t* serNum**: Buffer where the card's serial number will be stored.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
-### `CalulateCRC`
+### `CalculateCRC`
 
-**Descrição:**  
-Calcula o CRC de dados para comunicação com o cartão RFID.
+**Description:**  
+Calculates the CRC for data to communicate with the RFID card.
 
-**Parâmetros:**  
-- **uint8_t* pIndata**: Dados para os quais o CRC será calculado.  
-- **uint8_t len**: Comprimento dos dados.  
-- **uint8_t* pOutData**: Buffer onde o CRC calculado será armazenado.
+**Parameters:**  
+- **uint8_t* pIndata**: Data for which the CRC will be calculated.  
+- **uint8_t len**: Length of the data.  
+- **uint8_t* pOutData**: Buffer where the calculated CRC will be stored.
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `MFRC522_Write`
 
-**Descrição:**  
-Escreve um bloco de dados no cartão RFID.
+**Description:**  
+Writes a block of data to the RFID card.
 
-**Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco onde os dados serão escritos.  
-- **uint8_t* writeData**: Dados a serem escritos no cartão.
+**Parameters:**  
+- **uint8_t blockAddr**: Block address where the data will be written.  
+- **uint8_t* writeData**: Data to be written to the card.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `MFRC522_Read`
 
-**Descrição:**  
-Lê um bloco de dados do cartão RFID.
+**Description:**  
+Reads a block of data from the RFID card.
 
-**Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco a ser lido.  
-- **uint8_t* recvData**: Buffer onde os dados lidos serão armazenados.
+**Parameters:**  
+- **uint8_t blockAddr**: Block address to be read.  
+- **uint8_t* recvData**: Buffer where the read data will be stored.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `MFRC522_Auth`
 
-**Descrição:**  
-Autentica um bloco do cartão RFID para leitura ou escrita.
+**Description:**  
+Authenticates a block on the RFID card for reading or writing.
 
-**Parâmetros:**  
-- **uint8_t authMode**: Modo de autenticação (geralmente `PICC_AUTHENT1A`).  
-- **uint8_t blockAddr**: Endereço do bloco a ser autenticado.  
-- **uint8_t* key**: Chave de autenticação.  
-- **uint8_t* serNum**: Número de série do cartão.
+**Parameters:**  
+- **uint8_t authMode**: Authentication mode (typically `PICC_AUTHENT1A`).  
+- **uint8_t blockAddr**: Block address to be authenticated.  
+- **uint8_t* key**: Authentication key.  
+- **uint8_t* serNum**: Card serial number.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `MFRC522_SelectTag`
 
-**Descrição:**  
-Seleciona o cartão RFID com base no número de série.
+**Description:**  
+Selects the RFID card based on the serial number.
 
-**Parâmetros:**  
-- **uint8_t* serNum**: Número de série do cartão a ser selecionado.
+**Parameters:**  
+- **uint8_t* serNum**: Serial number of the card to be selected.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `MFRC522_Halt`
 
-**Descrição:**  
-Coloca o cartão RFID no estado de Halt (parada).
+**Description:**  
+Puts the RFID card in a Halt (stop) state.
 
-**Parâmetros:**  
-- **Nenhum**
+**Parameters:**  
+- **None**
 
-**Retorno:**  
+**Return:**  
 - **void**
 
 ---
 
 ### `Read_Single_Card`
 
-**Descrição:**  
-Realiza a leitura de um único cartão RFID, autenticando e lendo o bloco de dados.
+**Description:**  
+Reads a single RFID card, authenticating and reading the data block.
 
-**Parâmetros:**  
-- **uint8_t* serNum**: Buffer onde o número de série do cartão será armazenado.  
-- **uint8_t* recvData**: Buffer onde os dados lidos serão armazenados.
+**Parameters:**  
+- **uint8_t* serNum**: Buffer where the card's serial number will be stored.  
+- **uint8_t* recvData**: Buffer where the read data will be stored.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `Read_Multiple_Cards`
 
-**Descrição:**  
-Lê múltiplos cartões RFID, um por vez, realizando a autenticação e leitura de dados de cada cartão encontrado.
+**Description:**  
+Reads multiple RFID cards, one at a time, authenticating and reading data from each card found.
 
-**Parâmetros:**  
-- **uint8_t* serNum**: Buffer onde o número de série do cartão será armazenado.  
-- **uint8_t* recvData**: Buffer onde os dados lidos de cada cartão serão armazenados.
+**Parameters:**  
+- **uint8_t* serNum**: Buffer where the card's serial number will be stored.  
+- **uint8_t* recvData**: Buffer where the read data from each card will be stored.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `Write_Content_Card`
 
-**Descrição:**  
-Escreve um conteúdo personalizado em um bloco do cartão RFID após autenticação.
+**Description:**  
+Writes custom content to a block of the RFID card after authentication.
 
-**Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco onde os dados serão escritos.  
-- **uint8_t* writeData**: Buffer contendo os dados que serão escritos no cartão.  
-- **uint8_t* serNum**: Número de série do cartão a ser escrito.  
-- **uint8_t* key**: Chave de autenticação.
+**Parameters:**  
+- **uint8_t blockAddr**: Block address where the data will be written.  
+- **uint8_t* writeData**: Buffer containing the data to be written to the card.  
+- **uint8_t* serNum**: Serial number of the card to be written.  
+- **uint8_t* key**: Authentication key.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
 ---
 
 ### `Read_Content_Card`
 
-**Descrição:**  
-Lê o conteúdo de um bloco de um cartão RFID após autenticação.
+**Description:**  
+Reads the content of a block from the RFID card after authentication.
 
-**Parâmetros:**  
-- **uint8_t blockAddr**: Endereço do bloco a ser lido.  
-- **uint8_t* recvData**: Buffer onde os dados lidos serão armazenados.  
-- **uint8_t* serNum**: Número de série do cartão a ser lido.  
-- **uint8_t* key**: Chave de autenticação.
+**Parameters:**  
+- **uint8_t blockAddr**: Block address to be read.  
+- **uint8_t* recvData**: Buffer where the read data will be stored.  
+- **uint8_t* serNum**: Serial number of the card to be read.  
+- **uint8_t* key**: Authentication key.
 
-**Retorno:**  
-- **uint8_t**: Código de status da operação.
+**Return:**  
+- **uint8_t**: Operation status code.
 
+## Error Handling
 
-## Tratamento de Erros
+### Common Errors
 
-### Erros Comuns
+- **MI_OK**: Operation completed successfully.
+- **MI_ERR**: Communication error with the RFID card. Check the SPI connections.
+- **MI_NOTAGERR**: No card detected. Ensure the card is within the reading range.
 
-- **MI_OK**: Operação concluída com sucesso
-- **MI_ERR**: Erro de comunicação com o cartão RFID. Verifique as conexões SPI.
-- **MI_NOTAGERR**: Nenhum cartão detectado. Certifique-se de que o cartão esteja no campo de leitura.
+## Contribution
 
-
-## Contribuição
-
-Sinta-se à vontade para enviar pull requests ou abrir issues para melhorias e correções que sejam nescessário para um melhor funcionamento da biblioteca.
-
-
+Feel free to submit pull requests or open issues for any improvements or fixes needed for better library functionality.
 
 
