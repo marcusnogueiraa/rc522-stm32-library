@@ -210,68 +210,77 @@ Below is the schematic for connecting the RC522 reader to the STM32F103xx microc
 #include "uart.h"
 #include "string.h"
 
-uint8_t defaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t startBlock = 4;
-char myString[] = "Testing 1, 2, 3... ";
-
 void GPIO_Config() {
-    RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
-    RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-    RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
-    RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
+  //Clock SPI, GPIOA and GPIOB enable
+  RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
+  RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
+  RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 
-    // PA4- CE, PA5-SCK, PA7-MOSI, PA6-MISO:
-    // PA5 SCK will be set as alternate function output push-pull
-    GPIOA->CRL |= GPIO_CRL_MODE5_0 | GPIO_CRL_MODE5_1;  // Output Mode
-    GPIOA->CRL |= GPIO_CRL_CNF5_1;                     // Alternate Function
-    GPIOA->CRL &=  ~(GPIO_CRL_CNF5_0);
-    // PA7 MOSI will be set as alternate function output push-pull
-    GPIOA->CRL |= GPIO_CRL_MODE7_0 | GPIO_CRL_MODE7_1;  // Output Mode
-    GPIOA->CRL |= GPIO_CRL_CNF7_1;                     // Alternate Function
-    GPIOA->CRL &=  ~(GPIO_CRL_CNF7_0);
-    // PA4 CE will be set as General Purpose Output Mode
-    GPIOA->CRL |= GPIO_CRL_MODE4_0 | GPIO_CRL_MODE4_1;  // Output Mode
-    GPIOA->CRL &= ~GPIO_CRL_CNF4_1;                     // General Purpose
-    GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);
-    // PA6 MISO will be set as Floating Input Mode
-    GPIOA->CRL &= ~(GPIO_CRL_MODE6_0 | GPIO_CRL_MODE6_1);  // Input Mode
-    GPIOA->CRL &= ~GPIO_CRL_CNF6_1;                       // Floating Input
-    GPIOA->CRL |=  (GPIO_CRL_CNF6_0);
-    // PC13
-    GPIOC->CRH = 0xFF0FFFFF;
-    GPIOC->CRH = 0x00200000;
-    GPIOC->ODR &= ~(1 << 13);
-    // PB0
-    GPIOB->CRL = 0xFFFFFFF0;
-    GPIOB->CRL = 0x00000002;
-    GPIOB->ODR &= ~(1 << 0);
+  //PA5 SCK
+  GPIOA->CRL |= GPIO_CRL_MODE5_0 | GPIO_CRL_MODE5_1;        //Output Mode
+  GPIOA->CRL |= GPIO_CRL_CNF5_1;                             //Alternate Function
+  GPIOA->CRL &=  ~(GPIO_CRL_CNF5_0);
+  //PA7 MOSI
+  GPIOA->CRL |= GPIO_CRL_MODE7_0 | GPIO_CRL_MODE7_1;         //Output Mode
+  GPIOA->CRL |= GPIO_CRL_CNF7_1;                             //Alternate Function
+  GPIOA->CRL &=  ~(GPIO_CRL_CNF7_0);
+  //PA4 NSS
+  GPIOA->CRL |= GPIO_CRL_MODE4_0 | GPIO_CRL_MODE4_1;         //Output Mode
+  GPIOA->CRL &= ~GPIO_CRL_CNF4_1;                           //General Purpose
+  GPIOA->CRL &=  ~(GPIO_CRL_CNF4_0);
+  //PA6 MISO
+  GPIOA->CRL &= ~(GPIO_CRL_MODE6_0 | GPIO_CRL_MODE6_1);     //Input Mode
+  GPIOA->CRL &= ~GPIO_CRL_CNF6_1;                            //Floating Input
+  GPIOA->CRL |=  (GPIO_CRL_CNF6_0);
+  //PB0 RST
+  GPIOB->CRL |= GPIO_CRL_MODE0_0 | GPIO_CRL_MODE0_1;         //Output Mode
+  GPIOB->CRL &= ~GPIO_CRL_CNF0_1;                           //General Purpose
+  GPIOB->CRL &=  ~(GPIO_CRL_CNF0_0);
 }
 
 void SPI_Init() {
-    GPIO_Config();
-    RCC->APB2ENR |= (1 << 12);         // Enable SPI1 Clock
-    SPI1->CR1 &= ~(1 << 0) | (1 << 1); // CPOL=0, CPHA=0
-    SPI1->CR1 |= (1 << 2);             // Master Mode
-    SPI1->CR1 |= (2 << 3);             // BR[2:0] = 010: fPCLK/8, PCLK2 = 72MHz, SPI clk = 9MHz
-    SPI1->CR1 &= ~(1 << 7);            // LSBFIRST = 0, MSB first
-    SPI1->CR1 |= (1 << 8) | (1 << 9);  // SSM=1, SSI=1 -> Software Slave Management
-    SPI1->CR1 &= ~(1 << 10);           // RXONLY = 0, full-duplex
-    SPI1->CR1 &= ~(1 << 11);           // DFF=0, 8 bit data
-    SPI1->CR1 |= (1 << 6);             // SPE=1, Peripheral enabled
+  GPIO_Config();
+  RCC->APB2ENR |= (1 << 12);          // Enable SPI1 CLock
+  SPI1->CR1 &= ~(1 << 0) | (1 << 1);  // CPOL=0, CPHA=0
+  SPI1->CR1 |= (1 << 2);              // Master Mode
+  SPI1->CR1 |= (2 << 3);              // BR[2:0] = 010: fPCLK/8, PCLK2 = 72MHz, SPI clk = 9MHz
+  SPI1->CR1 &= ~(1 << 7);              // LSBFIRST = 0, MSB first
+  SPI1->CR1 |= (1 << 8) | (1 << 9);   // SSM=1, SSi=1 -> Software Slave Management
+  SPI1->CR1 &= ~(1 << 10);            // RXONLY = 0, full-duplex
+  SPI1->CR1 &= ~(1 << 11);             // DFF=0, 8 bit data
+  SPI1->CR1 |= (1 << 6);              // SPE=1, Peripheral enabled
 }
 
-int main() {
-    SPI_Init();           // Initialize SPI
-    MFRC522_Init();       // Initialize the RC522 module
-    USART1_Init();        // Initialize UART for debugging
+int main()
+{
+  SPI_Init();    
+  MFRC522_Init(); 
+  USART1_Init();  
 
-    uint8_t uid[10];
-    if (Read_MFRC522(uid) == MI_OK) {
-        uart_write("Card UID: %s\n", uid);
+  uint8_t str[MAX_LEN];
+  uint8_t sNum[150];
+  uint8_t ch[] = "\n\r";
+
+  while (1)
+  {
+    uchar requestStatus, anticollStatus;
+    requestStatus = MFRC522_Request(PICC_REQIDL, str);
+    if (requestStatus == MI_OK)
+    {
+      anticollStatus = MFRC522_Anticoll(str);
+      if (anticollStatus == MI_OK)
+      {
+        MFRC522_SelectTag(str);
+        int_to_string(str, 5, sNum);
+        uart_write(sNum);
+        delay_ms(50);
+        uart_write(ch);
+        MFRC522_Halt();
+      }
     }
-
-    return 0;
-} 
+  }
+  return 0;
+}
 ```
 
 ## API Reference
