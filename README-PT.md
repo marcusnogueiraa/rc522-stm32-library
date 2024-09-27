@@ -598,6 +598,8 @@ Lê o conteúdo de um bloco de um cartão RFID após autenticação.
 **Retorno:**  
 - **uint8_t**: Código de status da operação.
 
+## Esquemático
+![Schematic](schematic.png)
 
 ## Tratamento de Erros
 
