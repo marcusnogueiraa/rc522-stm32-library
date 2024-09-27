@@ -2,17 +2,16 @@
 #include "stm32f1xx.h"
 #include "rc522.h"
 #include "uart.h"
-#include "string.h"
+#include "timer.h"
 
-uint8_t defaultKey[6] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-uint8_t startBlock = 4;
-char myString[] = "Testando 1, 2, 3... ";
-
+uchar Key[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uchar block = 4;
+uchar myString[] = "FERIASSSSS!\n\r";
 
 void GPIO_Config() {
 	RCC->APB2ENR |= RCC_APB2ENR_SPI1EN;
 	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
-	RCC->APB2ENR |= RCC_APB2ENR_IOPCEN;
+
 	RCC->APB2ENR |= RCC_APB2ENR_IOPBEN;
 
 
@@ -34,10 +33,6 @@ void GPIO_Config() {
 	GPIOA->CRL &= ~(GPIO_CRL_MODE6_0 | GPIO_CRL_MODE6_1);       //Input Mode
 	GPIOA->CRL &= ~GPIO_CRL_CNF6_1;        					    //Floating Input
 	GPIOA->CRL |=  (GPIO_CRL_CNF6_0);
-	//PC13
-	GPIOC->CRH = 0xFF0FFFFF;
-	GPIOC->CRH = 0x00200000;
-	GPIOC->ODR &= ~(1 << 13);
 	//PB0
 	GPIOB->CRL = 0xFFFFFFF0;
 	GPIOB->CRL = 0x00000002;
@@ -61,7 +56,10 @@ int main() {
   SPI_Init();
   MFRC522_Init();
   USART1_Init();
-  while (1) {
-	Write_Content_Card(PICC_AUTHENT1A, myString, startBlock, defaultKey);
+  while(1) {
+	  Read_Single_Card();
+	  //Read_Multiple_Cards();
+	  //Write_Content_Card(PICC_AUTHENT1A, myString, block, Key);
+	  //Read_Content_Card(PICC_AUTHENT1A, block, Key);
   }
 }

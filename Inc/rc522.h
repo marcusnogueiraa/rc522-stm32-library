@@ -8,7 +8,7 @@
 #define GPIO_PIN_13                ((uint16_t)0x2000)  /* Pin 13 selected   */
 
 #define  uchar  unsigned char
-#define  uint  unsigned int
+#define  uint   unsigned int
 
 //Maximum length of the array
 #define MAX_LEN 16
@@ -135,10 +135,9 @@ uchar MFRC522_Auth(uchar authMode, uchar BlockAddr, uchar *Sectorkey, uchar *ser
 uchar MFRC522_SelectTag(uchar *serNum);
 void MFRC522_Halt();
 
-
 void Read_Single_Card();
-void Write_Content_Card(uchar authMode, uchar* myString, uchar startBlock, uchar *Sectorkey);
-void Read_Content_Card(uchar authMode, uchar startBlock, uchar *Sectorkey);
-
+void Read_Multiple_Cards();
+void Write_Content_Card(uchar authMode, uchar* myString, uchar block, uchar *Sectorkey);
+void Read_Content_Card(uchar authMode, uchar block, uchar *Sectorkey);
 
 #endif /* RC522_H_ */
