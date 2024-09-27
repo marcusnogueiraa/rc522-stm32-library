@@ -140,7 +140,7 @@ Sorted alphabetically
 
 
 
-
+---
 # rc522-stm32-Library
 
 Essa biblioteca foi criada para simplificar a comunicação entre o microcontrolador STM32 (da linha STM32F103xx) e o leitor de RFID RC522 usando a interface SPI. Em vez de lidar com a complexidade de controlar o RC522 diretamente, ela facilita o processo, permitindo que o usuário trabalhe com cartões RFID de maneira prática e eficiente.
