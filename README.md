@@ -597,6 +597,9 @@ Reads the content of a block from the RFID card after authentication.
 **Return:**  
 - **uint8_t**: Operation status code.
 
+## Schematic
+![Schematic](schematic.png)
+
 ## Error Handling
 
 ### Common Errors
