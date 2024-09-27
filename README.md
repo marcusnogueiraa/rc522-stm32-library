@@ -1,4 +1,4 @@
-# RC522 RFID - STM32 Libary
+# RC522 RFID - STM32 Library
 Collaborative project among students of the Microcontrollers course, aiming to create a library that abstracts the use of the RFID reader module RC522 on STM32 Blue Pill microcontrollers.
 
 ## 🚀 Features
