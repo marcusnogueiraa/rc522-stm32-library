@@ -1,1 +1,8 @@
-F1_Header/* linguist-vendored
+F1_Header/Device/ST/STM32F1xx/Include/* linguist-vendored
+F1_Header/Device/ST/STM32F1xx/Source/Templates/* linguist-vendored
+F1_Header/Device/ST/STM32F1xx/Source/Templates/arm/* linguist-vendored
+F1_Header/Device/ST/STM32F1xx/Source/Templates/gcc/* linguist-vendored
+F1_Header/Device/ST/STM32F1xx/Source/Templates/iar/* linguist-vendored
+F1_Header/Include/* linguist-vendored
+
+
